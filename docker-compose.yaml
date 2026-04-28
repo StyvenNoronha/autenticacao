@@ -1,0 +1,10 @@
+services:
+  postgresql:
+    image: bitnami/postgresql:latest
+    restart: always
+    environment:
+      - POSTGRESQL_USERNAME=admin
+      - POSTGRESQL_PASSWORD=admin123
+      - POSTGRESQL_DATABASE=autenticacao
+    ports:
+      - "5432:5432"
