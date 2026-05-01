@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createUser, getUserByEmail } from "../services/user";
 import { generateOPT, validateOPT } from "../services/otp";
 import { sendTestEmail } from "../lib/mailtrap";
+import { createJWT } from "../lib/jwt";
 
 export const auth = async (request: Request, response: Response) => {
   const authSignInSchema = z.object({
@@ -56,6 +57,7 @@ export const useOpt = async (request: Request, response: Response) => {
     id: z.string({ message: "Id do OPT obrigatório" }),
     code: z.string().length(6, "código precisa de 6 numero"),
   });
+
   const data = authUseOptSchema.safeParse(request.body);
   if (!data.success) {
     return response.json({ error: data.error.flatten().fieldErrors });
@@ -65,4 +67,8 @@ export const useOpt = async (request: Request, response: Response) => {
   if (!user) {
     return response.json({ error: "OPT invalido ou expirado" });
   }
+
+  const token = createJWT(user.id);
+
+  return response.json({ message: token, user });
 };
