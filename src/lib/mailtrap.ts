@@ -12,7 +12,7 @@ export const sendTestEmail = async (
   try {
     // Envia o email (vai parar na inbox de teste configurada no Mailtrap)
     await client.send({
-      from: { name: "Sistema", email: "sistemaTeste@example.com" },
+      from: { name: "Sistema", email: "smtp.mailersend.net" },
       to: [{ email: to }],
       subject,
       text: body,
