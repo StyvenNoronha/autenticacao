@@ -20,5 +20,29 @@ export const generateOPT = async (userId: number) => {
     },
   });
 
-  return opt
+  return opt;
+};
+
+export const validateOPT = async (id: string, code: string) => {
+  const opt = await prisma.otp.findFirst({
+    select: {
+      user: true,
+    },
+    where: {
+      id,
+      code,
+      expiresAt: {
+        gt: new Date(),
+      },
+      used: false,
+    },
+  });
+  if (opt && opt.user) {
+    await prisma.otp.update({
+      where: { id },
+      data: { used: true },
+    });
+    return opt.user;
+  }
+  return false;
 };

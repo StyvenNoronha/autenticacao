@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { createUser, getUserByEmail } from "../services/user";
-import { generateOPT } from "../services/otp";
+import { generateOPT, validateOPT } from "../services/otp";
 import { sendTestEmail } from "../lib/mailtrap";
 
 export const auth = async (request: Request, response: Response) => {
@@ -49,4 +49,20 @@ export const signup = async (request: Request, response: Response) => {
   }
   const newUser = await createUser(data.data.name, data.data.email);
   response.status(201).json({ user: newUser });
+};
+
+export const useOpt = async (request: Request, response: Response) => {
+  const authUseOptSchema = z.object({
+    id: z.string({ message: "Id do OPT obrigatório" }),
+    code: z.string().length(6, "código precisa de 6 numero"),
+  });
+  const data = authUseOptSchema.safeParse(request.body);
+  if (!data.success) {
+    return response.json({ error: data.error.flatten().fieldErrors });
+  }
+
+  const user = await validateOPT(data.data.id, data.data.code);
+  if (!user) {
+    return response.json({ error: "OPT invalido ou expirado" });
+  }
 };
