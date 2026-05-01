@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { email, z } from "zod";
-import { da } from "zod/v4/locales";
+import { z } from "zod";
 import { getUserByEmail } from "../services/user";
 import { generateOPT } from "../services/otp";
+import { sendTestEmail } from "../lib/mailtrap";
 
 export const auth = async (request: Request, response: Response) => {
   const authSignInSchema = z.object({
@@ -23,6 +23,11 @@ export const auth = async (request: Request, response: Response) => {
 
   const opt = await generateOPT(user.id);
 
+  await sendTestEmail(
+    user.email,
+    "Seu código de acesso e " + opt.code,
+    "Digite seu código: " + opt.code,
+  );
 
-  response.json({message: opt.id})
+  response.json({ message: opt.id });
 };
