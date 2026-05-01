@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { email, z } from "zod";
 import { da } from "zod/v4/locales";
 import { getUserByEmail } from "../services/user";
+import { generateOPT } from "../services/otp";
 
 export const auth = async (request: Request, response: Response) => {
   const authSignInSchema = z.object({
@@ -16,7 +17,12 @@ export const auth = async (request: Request, response: Response) => {
   }
 
   const user = await getUserByEmail(data.data.email);
-  if(!user){
-    return response.json({error: "Usuário não existe."})
+  if (!user) {
+    return response.json({ error: "Usuário não existe." });
   }
+
+  const opt = await generateOPT(user.id);
+
+
+  response.json({message: opt.id})
 };
